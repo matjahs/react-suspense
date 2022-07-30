@@ -23,7 +23,11 @@ function PokemonInfo({pokemonResource}) {
   )
 }
 
-const SUSPENSE_CONFIG = {timeoutMs: 4000}
+const SUSPENSE_CONFIG = {
+  timeoutMs: 4000,
+  busyDelayMs: 400,
+  busyMinDurationMs: 100,
+}
 
 function createPokemonResource(pokemonName) {
   return createResource(fetchPokemon(pokemonName, 200))
