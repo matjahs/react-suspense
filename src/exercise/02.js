@@ -1,18 +1,18 @@
 // Render as you fetch
 // http://localhost:3000/isolated/exercise/02.js
 
-import * as React from "react";
+import * as React from 'react'
 import {
   fetchPokemon,
   PokemonInfoFallback,
   PokemonForm,
   PokemonDataView,
-  PokemonErrorBoundary
-} from "../pokemon";
-import {createResource} from "../utils";
+  PokemonErrorBoundary,
+} from '../pokemon'
+import {createResource} from '../utils'
 
 function PokemonInfo({pokemonResource}) {
-  const pokemon = pokemonResource.read();
+  const pokemon = pokemonResource.read()
 
   return (
     <div>
@@ -21,28 +21,26 @@ function PokemonInfo({pokemonResource}) {
       </div>
       <PokemonDataView pokemon={pokemon} />
     </div>
-  );
+  )
 }
 
 function App() {
-  const [pokemonName, setPokemonName] = React.useState("");
-  const [pokemonResource, setPokemonResource] = React.useState(null);
+  const [pokemonName, setPokemonName] = React.useState('')
+  const [pokemonResource, setPokemonResource] = React.useState(null)
 
   React.useEffect(() => {
     if (!pokemonName) {
-      setPokemonResource(null);
-      return;
+      setPokemonResource(null)
+      return
     }
 
     setPokemonResource(
-      pokemonName
-      ? createResource(fetchPokemon(pokemonName))
-      : null
-    );
-  }, [pokemonName]);
+      pokemonName ? createResource(fetchPokemon(pokemonName)) : null,
+    )
+  }, [pokemonName])
 
   function handleSubmit(newPokemonName) {
-    setPokemonName(newPokemonName);
+    setPokemonName(newPokemonName)
   }
 
   return (
@@ -57,11 +55,11 @@ function App() {
             </React.Suspense>
           </PokemonErrorBoundary>
         ) : (
-           "Submit a pokemon"
-         )}
+          'Submit a pokemon'
+        )}
       </div>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
