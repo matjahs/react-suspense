@@ -4,10 +4,10 @@
 import * as React from 'react'
 import {
   fetchPokemon,
-  PokemonInfoFallback,
-  PokemonForm,
   PokemonDataView,
   PokemonErrorBoundary,
+  PokemonForm,
+  PokemonInfoFallback,
 } from '../pokemon'
 import {createResource} from '../utils'
 
@@ -42,18 +42,38 @@ function getPokemonResource(name) {
   return resource
 }
 
-function PokemonCacheProvider({children}) {
+function PokemonCacheProvider({children, cacheTime = 5000}) {
   const cache = React.useRef({})
+  const expirations = React.useRef({})
 
-  const getPokemonResource = React.useCallback(name => {
-    const lowerName = name.toLowerCase()
-    let resource = cache.current[lowerName]
-    if (!resource) {
-      resource = createPokemonResource(lowerName)
-      cache.current[lowerName] = resource
-    }
-    return resource
-  }, [])
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      for (const [name, time] of Object.entries(expirations.current)) {
+        if (time < Date.now()) {
+          continue
+        }
+        delete cache.current[name]
+        delete expirations.current[name]
+      }
+    }, 1000)
+
+    return () => clearInterval(interval)
+  })
+
+  const getPokemonResource = React.useCallback(
+    name => {
+      const lowerName = name.toLowerCase()
+
+      let resource = cache.current[lowerName]
+      if (!resource) {
+        resource = createPokemonResource(lowerName)
+        cache.current[lowerName] = resource
+      }
+      expirations.current[lowerName] = Date.now() + cacheTime
+      return resource
+    },
+    [cacheTime],
+  )
 
   return (
     <PokemonResourceCacheContext.Provider value={getPokemonResource}>
@@ -120,7 +140,7 @@ function App() {
 
 function AppWithProvider() {
   return (
-    <PokemonCacheProvider>
+    <PokemonCacheProvider cacheTime={15000}>
       <App />
     </PokemonCacheProvider>
   )
